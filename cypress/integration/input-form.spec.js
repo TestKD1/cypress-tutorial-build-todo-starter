@@ -1,6 +1,6 @@
 describe('Input form', () => {
     beforeEach(() =>{
-        cy.visit('/') //this value is in cypress.jason
+        cy.visit('/') //this value is in cypress.json
     })
     it('focuses input on load', () =>{
         
@@ -12,12 +12,29 @@ describe('Input form', () => {
     it('accepts input', () => {
         const typedText = 'Buy Milk'
     
-
         cy.get('.new-todo')
             .type(typedText)
             .should('have.value', typedText)
 
+    })
 
+    context('Form submission', () => {
+        it.only('Adds a new todo on submit', () =>{
+            const itemText = 'Buy eggs'
+            cy.server()
+            cy.route('POST', '/api/todos', {
+                name: itemText,
+                id: 1,
+                isComplete: false
+            })
 
+            cy.get('.new-todo')
+                .type(itemText)
+                .type ('{enter}')
+                .should('have.value')
+            cy.get('.todo-list li')
+                .should('have.length', 1)
+                .and('contain', itemText)
+        })
     })
 })
